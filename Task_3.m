@@ -124,8 +124,8 @@ end
 %Scaling factor for all the values in order to get A and 
 scaling = 1000;
 %Scaling the Values
-u_scaled = u(:)./1000;
-i_scaled = i(:)./1000;
+u_scaled = u(:,:)./scaling;
+i_scaled = i(:,:)./scaling;
 
 N = 2000;
 %Order of Polynomial to fit:
@@ -137,23 +137,23 @@ num_coeff = d + 1;
 %Dependant variable
 %Transposing in order to receive columnvector
 %Names chosen for consistency with the script
-y=i(1:N)';
+y=i_scaled(1:N)';
     
 %Preallocate memory for the Regression matrix
 PHI=ones(N,num_coeff);
 
 %Fill in the matrix data, directly compute the powers
 for it=1:num_coeff
-    PHI(:,it)=u(1:N).^(it-1);    
+    PHI(:,it)=u_scaled(1:N).^(it-1);    
 end
 
 %Compute estimator parameters
 clear theta;
-theta=pinv(PHI)*y
+theta_scaled=pinv(PHI)*y
 
 %Flip for compatibility
 clear coeffs;
-coeffs=flipud(theta);
+coeffs_scaled=flipud(theta_scaled);
 
 %Prepare figure
 figure('Name', 'Plot of scaled Data with Estimator');
@@ -166,7 +166,7 @@ hold on;
 clear x_p;
 clear y_p;
 x_p = 0:0.01:0.9;
-y_p = polyval(coeffs, x_p);
+y_p = polyval(coeffs_scaled, x_p);
 
 plot_data = plot(data(1:16000,1)./scaling,data(1:16000,2)./scaling, '+');
 plot_data.Annotation.LegendInformation.IconDisplayStyle = 'off';
